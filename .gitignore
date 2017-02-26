@@ -1,0 +1,9 @@
+*.pyc
+.Python
+bin/
+include/
+lib/
+pip-selfcheck.json
+*.egg-info/
+dist/
+git_suggest/__pycache__/
