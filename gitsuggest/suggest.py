@@ -8,6 +8,7 @@ This module contains the primary objects that power GitSuggest.
 """
 
 import itertools
+from operator import attrgetter
 
 import enchant
 import github
@@ -25,6 +26,17 @@ class GitSuggest(object):
         :param username: Github username.
         :param password: Github password.
         """
+        # Authenticated github user.
+        self.github = None
+        # Repositories authenticated user is interested in.
+        self.__repositories_interested_in = None
+        # Cleaned and sanitized tokens.
+        self.__cleaned_tokens = None
+        # Constructed LDA model.
+        self.lda_model = None
+        # Suggested repository set.
+        self.suggested_repositories = None
+
         try:
             authenticated_user = github.Github(username, password)
 
@@ -36,71 +48,86 @@ class GitSuggest(object):
         except github.GithubException:
             raise ValueError('Unable to authenticate the user.')
 
-    def get_repos_for_query(self, query, count=10):
-        """Method to procure git repositories for the query provided.
-
-        :param query: String representing the repositories intend to search.
-        :param count: Number of repositories to yeild.
-        :return: Yields min(`count`, fetched) number of repositories for the
-        query.
-        """
-        repo_gen = self.github.search_repositories(query, 'stars', 'desc')
-        for index, repo in enumerate(repo_gen):
-            if index < count:
-                yield repo
-            else:
-                break
-
     def get_suggested_repositories(self):
         """Method to procure suggested repositories for the user.
 
-        :return: Suggested repositories for the authenticated user.
+        :return: Iterator to procure suggested repositories for the user.
         """
-        # Procure query for repository suggestion.
-        query = self.__get_query_for_repos()
+        if self.suggested_repositories is None:
+            # Procure repositories to suggest to user.
+            repository_set = set()
+            for term_count in range(5, 2, -1):
+                query = self.__get_query_for_repos(term_count=term_count)
+                repository_set.update(self.__get_repos_for_query(query))
 
-        # Suggest repositories to the user.
-        return self.get_repos_for_query(query)
+            # Remove repositories authenticated user is already interested in.
+            already_starred = self.__repositories_interested_in
+            catchy_repos = list(repository_set - already_starred)
+
+            # Present the repositories, highly starred to not starred.
+            catchy_repos = sorted(catchy_repos,
+                                  key=attrgetter('stargazers_count'),
+                                  reverse=True)
+            self.suggested_repositories = catchy_repos
+
+        # Return an iterator to help user fetch the repository listing.
+        for repository in self.suggested_repositories:
+            yield repository
 
     def __get_interests(self):
-        """Method to procure description of repositories the user is already
-        interested in.
+        """Method to procure description of repositories the authenticated user
+        is interested in.
+
+        We currently attribute interest to:
+        1. The repositories the authenticated user has starred.
+        2. The repositories the users the authenticated user follows have
+        starred.
 
         :return: List of repository descriptions.
         """
-        repo_desc = set()
+        if self.__repositories_interested_in is None:
+            self.__repositories_interested_in = set()
 
-        # Add starred repositories of the authenticated user.
-        cur_user = self.github.get_user()
-        repo_desc.update([repo.description for repo in cur_user.get_starred()])
+            # Add starred repositories of the authenticated user.
+            cur_user = self.github.get_user()
+            self.__repositories_interested_in.update(cur_user.get_starred())
 
-        """
-        # Add starred repositories of users followed by authenticated user.
-        # NOTE: Too time consuming at the moment.
-        """
-        for user in cur_user.get_following():
-            repo_desc.update([repo.description for repo in user.get_starred()])
+            # Add starred repositories of users followed by authenticated user.
+            # NOTE: Too time consuming at the moment.
+            for user in cur_user.get_following():
+                self.__repositories_interested_in.update(user.get_starred())
 
-        return list(repo_desc)
+        # Extract descriptions out of repositories of interest.
+        repo_desc = [r.description for r in self.__repositories_interested_in]
+        return repo_desc
 
     def __get_words_to_ignore(self):
         """Compiles list of all words to ignore.
 
         :return: List of words to ignore.
         """
+        # Stop words in English.
         english_stopwords = nltk.corpus.stopwords.words('english')
+
+        # Languages in git repositories.
         git_languages = []
         with open('../gitlang/languages.txt', 'r') as langauges:
             git_languages = [line.strip() for line in langauges]
 
-        return list(itertools.chain(english_stopwords, git_languages))
+        # Other words to avoid in git repositories.
+        words_to_avoid = []
+        with open('../gitlang/others.txt', 'r') as languages:
+            words_to_avoid = [line.strip() for line in languages]
+
+        return list(itertools.chain(english_stopwords, git_languages,
+                                    words_to_avoid))
 
     def __get_words_to_consider(self):
         """Compiles list of all words to consider.
 
         :return: List of words to consider.
         """
-        return enchant.Dict("en_US")
+        return enchant.Dict('en_US')
 
     def __clean_and_tokenize(self, doc_list):
         """Method to clean and tokenize the document list.
@@ -140,28 +167,50 @@ class GitSuggest(object):
 
         return cleaned_doc_list
 
+    def __construct_lda_model(self):
+        """Method to create LDA model to procure list of topics from.
+
+        We do that by first fetching the descriptions of repositories user has
+        shown interest in. We tokenize the hence fetched descriptions to
+        procure list of cleaned tokens by dropping all the stop words and
+        langauge names from it.
+
+        We use the cleaned and sanitized token list to train LDA model from
+        which we hope to procure topics of interests to the authenticated user.
+        """
+        # Fetch descriptions of repos of interest to authenticated user.
+        repos_of_interest = self.__get_interests()
+
+        # Procure clean tokens from the descriptions.
+        cleaned_tokens = self.__clean_and_tokenize(repos_of_interest)
+
+        # Setup LDA requisites.
+        dictionary = corpora.Dictionary(cleaned_tokens)
+        corpus = [dictionary.doc2bow(text) for text in cleaned_tokens]
+
+        # Generate LDA model
+        self.lda_model = models.ldamodel.LdaModel(
+            corpus, num_topics=1, id2word=dictionary, passes=10)
+
     def __get_query_for_repos(self, term_count=5):
         """Method to procure query based on topics authenticated user is
         interested in.
 
         :return: Query string.
         """
-        # Get interests of authenticated user.
-        docs = self.__get_interests()
-
-        # Clean and tokenize the description strings.
-        docs = self.__clean_and_tokenize(docs)
-
-        # Setup LDA requisites.
-        dictionary = corpora.Dictionary(docs)
-        corpus = [dictionary.doc2bow(text) for text in docs]
-
-        # Generate LDA model
-        ldamodel = models.ldamodel.LdaModel(
-            corpus, num_topics=1, id2word=dictionary, passes=10)
+        if self.lda_model is None:
+            self.__construct_lda_model()
 
         repo_query_terms = []
-        for term in ldamodel.get_topic_terms(0, topn=term_count):
-            repo_query_terms.append(ldamodel.id2word[term[0]])
+        for term in self.lda_model.get_topic_terms(0, topn=term_count):
+            repo_query_terms.append(self.lda_model.id2word[term[0]])
 
         return ' '.join(repo_query_terms)
+
+    def __get_repos_for_query(self, query):
+        """Method to procure git repositories for the query provided.
+
+        :param query: String representing the repositories intend to search.
+        :return: Iterator for repositories found using the query.
+        """
+        return self.github.search_repositories(query, 'stars', 'desc')
