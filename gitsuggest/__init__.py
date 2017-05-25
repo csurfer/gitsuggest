@@ -18,7 +18,7 @@ might be interested in based on user's interests.
 :licence: MIT, see LICENSE for more details.
 """
 
-__title__ = 'git_suggest'
+__title__ = 'gitsuggest'
 __version__ = '0.0.1'
 __author__ = 'Vishwas B Sharma'
 __author_email__ = 'sharma.vishwas88@gmail.com'
@@ -26,3 +26,4 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2017 Vishwas B Sharma'
 
 from .suggest import GitSuggest
+from .utilities import ReposToHTML
