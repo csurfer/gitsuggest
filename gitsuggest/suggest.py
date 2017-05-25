@@ -68,11 +68,6 @@ class GitSuggest(object):
             already_starred = self.__repositories_interested_in
             catchy_repos = list(repository_set - already_starred)
 
-            # Present the repositories, highly starred to not starred.
-            catchy_repos = sorted(catchy_repos,
-                                  key=attrgetter('stargazers_count'),
-                                  reverse=True)
-
             # Filter out repositories with too long descriptions. This is a
             # measure to weed out spammy repositories.
             filtered_repos = []
@@ -84,7 +79,11 @@ class GitSuggest(object):
                        len(repo.description) <= GitSuggest.MAX_DESC_LEN:
                         filtered_repos.append(repo)
 
-            self.suggested_repositories = list(filtered_repos)
+            # Present the repositories, highly starred to not starred.
+            self.suggested_repositories = sorted(
+                list(set(filtered_repos)),
+                key=attrgetter('stargazers_count'),
+                reverse=True)
 
         # Return an iterator to help user fetch the repository listing.
         for repository in self.suggested_repositories:
