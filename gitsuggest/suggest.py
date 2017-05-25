@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-git_suggest.suggest
+gitsuggest.suggest
 ~~~~~~~~~~~~~~~~~~~
 
 This module contains the primary objects that power GitSuggest.
@@ -19,6 +19,10 @@ from nltk.tokenize import RegexpTokenizer
 
 class GitSuggest(object):
     """Class to suggest git repositories for a user."""
+
+    # Length of description of a repository over which it is a high chance
+    # that it is a spammy repository.
+    MAX_DESC_LEN = 300
 
     def __init__(self, username, password):
         """Constructor.
@@ -68,7 +72,19 @@ class GitSuggest(object):
             catchy_repos = sorted(catchy_repos,
                                   key=attrgetter('stargazers_count'),
                                   reverse=True)
-            self.suggested_repositories = catchy_repos
+
+            # Filter out repositories with too long descriptions. This is a
+            # measure to weed out spammy repositories.
+            filtered_repos = []
+
+            if len(catchy_repos) > 0:
+                for repo in catchy_repos:
+                    if repo is not None and \
+                       repo.description is not None and \
+                       len(repo.description) <= GitSuggest.MAX_DESC_LEN:
+                        filtered_repos.append(repo)
+
+            self.suggested_repositories = list(filtered_repos)
 
         # Return an iterator to help user fetch the repository listing.
         for repository in self.suggested_repositories:
@@ -99,7 +115,7 @@ class GitSuggest(object):
 
         # Extract descriptions out of repositories of interest.
         repo_desc = [r.description for r in self.__repositories_interested_in]
-        return repo_desc
+        return list(set(repo_desc))
 
     def __get_words_to_ignore(self):
         """Compiles list of all words to ignore.
@@ -147,9 +163,6 @@ class GitSuggest(object):
         # Get english words.
         dict_words = self.__get_words_to_consider()
 
-        # Clean doc_lists.
-        doc_list = [doc for doc in doc_list if doc is not None]
-
         for doc in doc_list:
             # Lowercase doc.
             lower = doc.lower()
@@ -180,6 +193,12 @@ class GitSuggest(object):
         """
         # Fetch descriptions of repos of interest to authenticated user.
         repos_of_interest = self.__get_interests()
+
+        # Some repositories fill entire documentation in description. We ignore
+        # such repositories for cleaner tokens.
+        repos_of_interest = filter(
+            lambda x: x is not None and len(x) <= GitSuggest.MAX_DESC_LEN,
+            repos_of_interest)
 
         # Procure clean tokens from the descriptions.
         cleaned_tokens = self.__clean_and_tokenize(repos_of_interest)
