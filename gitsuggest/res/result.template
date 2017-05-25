@@ -1,0 +1,16 @@
+<section class="col-xs-12 col-sm-6 col-md-12">
+    <article class="search-result row">
+        <div class="col-xs-12 col-sm-12 col-md-1">
+            <a href="$link" target="_blank" class="thumbnail">
+                <img src="https://cdn2.iconfinder.com/data/icons/black-white-social-media/64/social_media_logo_github-64.png" />
+            </a>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-11">
+            <h3>
+            <a href="$link" target="_blank">$title</a>
+            </h3>
+            <p>$description</p>
+        </div>
+        <span class="clearfix borda"></span>
+    </article>
+</section>
