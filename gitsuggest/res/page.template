@@ -40,7 +40,7 @@
     <body>
         <div class="container">
             <hgroup class="mb20">
-            <h1>Search Results</h1>
+            <h1>Repositories suggested by <a href="https://github.com/csurfer/gitsuggest" target="_blank">csurfer/gitsuggest</a></h1>
             </hgroup>
             $results
         </div>
