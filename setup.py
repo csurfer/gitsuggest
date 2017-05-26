@@ -38,6 +38,7 @@ setup(
         ],
     },
     test_suite='tests',
+    keywords='github repository suggestion',
     classifiers=[
         # Intended Audience.
         'Intended Audience :: Developers',
