@@ -80,10 +80,20 @@ class GitSuggest(object):
                         filtered_repos.append(repo)
 
             # Present the repositories, highly starred to not starred.
-            self.suggested_repositories = sorted(
-                list(set(filtered_repos)),
-                key=attrgetter('stargazers_count'),
-                reverse=True)
+            filtered_repos = sorted(filtered_repos,
+                                    key=attrgetter('stargazers_count'),
+                                    reverse=True)
+
+            self.suggested_repositories = list()
+
+            # TODO: Investigate why set(repositories) still not able to remove
+            # duplicates.
+            for repo in filtered_repos:
+                if len(self.suggested_repositories) == 0:
+                    self.suggested_repositories.append(repo)
+                elif self.suggested_repositories[-1].description != \
+                        repo.description:
+                    self.suggested_repositories.append(repo)
 
         # Return an iterator to help user fetch the repository listing.
         for repository in self.suggested_repositories:
