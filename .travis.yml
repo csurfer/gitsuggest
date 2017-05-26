@@ -10,6 +10,6 @@ install:
   - "pip install coveralls"
 # Command to run tests.
 script:
-  - "coverage run --source=rake_nltk setup.py test"
+  - "coverage run --source=gitsuggest setup.py test"
 after_success:
   - "coveralls"

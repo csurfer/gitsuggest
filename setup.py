@@ -18,7 +18,8 @@ setup(
 
     # Details
     version='0.0.1',
-    description='gitsuggest',
+    description='A tool to suggest github repositories based on the' +
+                ' repositories you have shown interest in.',
     long_description=long_description,
 
     # The project's main homepage.
@@ -53,7 +54,6 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         # Topic tags.
-        'Topic :: Software Development :: Build Tools',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     install_requires=['pyenchant', 'gensim', 'PyGithub', 'nltk'])
