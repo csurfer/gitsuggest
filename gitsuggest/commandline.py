@@ -10,21 +10,17 @@ This module contains code to use the GitSuggest as commandline.
 Usage:
 
     >>> gitsuggest --help
-    usage: gitsuggest [-h] [--password PASSWORD] username
+    usage: gitsuggest [-h] username
 
     positional arguments:
-      username             Github Username
+      username    Github Username
 
     optional arguments:
-      -h, --help           show this help message and exit
-      --password PASSWORD  Github Password
-
-    >>> gitsuggest <username> --password <password>
-    # To fetch suggested repositories for the authenticated user.
+      -h, --help  show this help message and exit
 
     >>> gitsuggest <username>
-    # Asks for password input in a secure way.
-    # To fetch suggested repositories for the authenticated user.
+    # Asks for password input in a secure way to fetch suggested repositories
+    # for the authenticated user.
 """
 
 import argparse
@@ -45,9 +41,6 @@ def main():
     parser.add_argument('username',
                         help='Github Username',
                         default=None)
-    parser.add_argument('--password',
-                        help='Github Password',
-                        default=None)
 
     # Parse command line arguments.
     arguments = parser.parse_args()
@@ -56,10 +49,11 @@ def main():
         parser.print_help()
         return
 
-    if arguments.password is None:
-        arguments.password = getpass.getpass()
+    password = getpass.getpass()
 
-    gs = GitSuggest(arguments.username, arguments.password)
+    print "Generating suggestions..."
+
+    gs = GitSuggest(arguments.username, password)
     repos = list(gs.get_suggested_repositories())
     r2h = ReposToHTML(repos)
 

@@ -6,6 +6,8 @@ gitsuggest
 A tool to suggest github repositories based on the repositories you have shown
 interest in.
 
+|Demo|
+
 Whats happening here?
 ---------------------
 
@@ -58,9 +60,6 @@ As a command
     # For help with usage
     gitsuggest --help
 
-    # With both username and password in command
-    gitsuggest <username> --password <password>
-
     # With just username in command to provide password secretly
     gitsuggest <username>
 
@@ -96,3 +95,5 @@ Pull requests are most welcome.
 
 .. |Licence| image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/csurfer/gitsuggest/master/LICENSE
+
+.. |Demo| image:: http://i.imgur.com/5j5YnLR.gif
