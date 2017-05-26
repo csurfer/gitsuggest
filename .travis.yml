@@ -1,0 +1,15 @@
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+# Command to install dependencies.
+install:
+  - "pip install -r requirements.txt"
+  - "pip install coveralls"
+# Command to run tests.
+script:
+  - "coverage run --source=rake_nltk setup.py test"
+after_success:
+  - "coveralls"

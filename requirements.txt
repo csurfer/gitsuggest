@@ -1,0 +1,7 @@
+# Requirement for constructing LDA model.
+pyenchant
+gensim
+# Requirement for Tokenization and cleaning.
+nltk
+# Requirement for connecting to Github.
+PyGithub
