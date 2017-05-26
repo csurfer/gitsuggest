@@ -2,7 +2,7 @@
 
 """
 gitsuggest.suggest
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 This module contains the primary objects that power GitSuggest.
 """

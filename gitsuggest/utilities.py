@@ -2,7 +2,7 @@
 
 """
 gitsuggest.utilities
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 This module contains utility classes which help in displaying the results.
 """

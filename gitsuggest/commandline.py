@@ -2,21 +2,29 @@
 # -*- coding: utf-8 -*-
 
 """
-gitsuggest as a command
-~~~~~~~~~~~~~~~~~~
+gitsuggest.commandline
+~~~~~~~~~~~~~~~~~~~~~~
+
+This module contains code to use the GitSuggest as commandline.
 
 Usage:
-    >>> pyheat --help
-    usage: pyheat [-h] [-o OUT] pyfile
+
+    >>> gitsuggest --help
+    usage: gitsuggest [-h] [--password PASSWORD] username
+
     positional arguments:
-    pyfile             Python file to be profiled
+      username             Github Username
+
     optional arguments:
-    -h, --help         show this help message and exit
-    -o OUT, --out OUT  Output file
-    >>> pyheat <filename>
-    # Displays the heatmap for the file.
-    >>> pyheat <filename> --out myimage.png
-    # Saves the heatmap as an image in file myimage.png
+      -h, --help           show this help message and exit
+      --password PASSWORD  Github Password
+
+    >>> gitsuggest <username> --password <password>
+    # To fetch suggested repositories for the authenticated user.
+
+    >>> gitsuggest <username>
+    # Asks for password input in a secure way.
+    # To fetch suggested repositories for the authenticated user.
 """
 
 import argparse
@@ -34,8 +42,12 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Adding command line arguments.
-    parser.add_argument('username', help='Username', default=None)
-    parser.add_argument('-p', '--password', help='Password', default=None)
+    parser.add_argument('username',
+                        help='Github Username',
+                        default=None)
+    parser.add_argument('--password',
+                        help='Github Password',
+                        default=None)
 
     # Parse command line arguments.
     arguments = parser.parse_args()
