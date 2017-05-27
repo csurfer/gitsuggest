@@ -8,6 +8,7 @@ This module contains the primary objects that power GitSuggest.
 """
 
 import itertools
+from collections import defaultdict
 from operator import attrgetter
 
 import enchant
@@ -59,14 +60,23 @@ class GitSuggest(object):
         """
         if self.suggested_repositories is None:
             # Procure repositories to suggest to user.
-            repository_set = set()
+            repository_set = list()
             for term_count in range(5, 2, -1):
                 query = self.__get_query_for_repos(term_count=term_count)
-                repository_set.update(self.__get_repos_for_query(query))
+                repository_set.extend(self.__get_repos_for_query(query))
 
             # Remove repositories authenticated user is already interested in.
-            already_starred = self.__repositories_interested_in
-            catchy_repos = list(repository_set - already_starred)
+            # NOTE: set() operation on Repository list is buggy. So rely on
+            # your own way to weed out duplicates and self starred
+            # repositories.
+            catchy_repos = list()
+            included_repositories = defaultdict(lambda: False)
+            for repo in self.github.get_user().get_starred():
+                included_repositories[repo.description] = True
+            for repo in repository_set:
+                if not included_repositories[repo.description]:
+                    catchy_repos.append(repo)
+                    included_repositories[repo.description] = True
 
             # Filter out repositories with too long descriptions. This is a
             # measure to weed out spammy repositories.
@@ -111,16 +121,17 @@ class GitSuggest(object):
         :return: List of repository descriptions.
         """
         if self.__repositories_interested_in is None:
-            self.__repositories_interested_in = set()
+            self.__repositories_interested_in = list()
 
             # Add starred repositories of the authenticated user.
             cur_user = self.github.get_user()
-            self.__repositories_interested_in.update(cur_user.get_starred())
+            self.__repositories_interested_in.extend(cur_user.get_starred())
 
             # Add starred repositories of users followed by authenticated user.
             # NOTE: Too time consuming at the moment.
+            # TODO: Check if this can be optimized by some kind of pagination.
             for user in cur_user.get_following():
-                self.__repositories_interested_in.update(user.get_starred())
+                self.__repositories_interested_in.extend(user.get_starred())
 
         # Extract descriptions out of repositories of interest.
         repo_desc = [r.description for r in self.__repositories_interested_in]
@@ -185,6 +196,9 @@ class GitSuggest(object):
             # Remove stopwords.
             tokens = [tok for tok in tokens if tok not in stopwords]
 
+            # Filter Nones if any are introduced.
+            tokens = filter(lambda x: x is not None, tokens)
+
             cleaned_doc_list.append(tokens)
 
         return cleaned_doc_list
@@ -224,12 +238,13 @@ class GitSuggest(object):
         """Method to procure query based on topics authenticated user is
         interested in.
 
+        :param term_count: Count of terms in query.
         :return: Query string.
         """
         if self.lda_model is None:
             self.__construct_lda_model()
 
-        repo_query_terms = []
+        repo_query_terms = list()
         for term in self.lda_model.get_topic_terms(0, topn=term_count):
             repo_query_terms.append(self.lda_model.id2word[term[0]])
 

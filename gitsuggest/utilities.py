@@ -60,5 +60,5 @@ class ReposToHTML(object):
         """
         page_html = self.get_html()
 
-        with open(write_to, 'w') as writefile:
+        with open(write_to, 'wb') as writefile:
             writefile.write(page_html.encode('utf-8'))

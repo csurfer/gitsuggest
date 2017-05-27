@@ -51,7 +51,7 @@ def main():
 
     password = getpass.getpass()
 
-    print "Generating suggestions..."
+    print("Generating suggestions...")
 
     gs = GitSuggest(arguments.username, password)
     repos = list(gs.get_suggested_repositories())
