@@ -10,6 +10,7 @@ This module contains the primary objects that power GitSuggest.
 import itertools
 from collections import defaultdict
 from operator import attrgetter
+from os import path
 
 import enchant
 import github
@@ -147,12 +148,16 @@ class GitSuggest(object):
 
         # Languages in git repositories.
         git_languages = []
-        with open('../gitlang/languages.txt', 'r') as langauges:
+        language_file = path.join(path.abspath(path.dirname(__file__)),
+                                  '../gitlang/languages.txt')
+        with open(language_file, 'r') as langauges:
             git_languages = [line.strip() for line in langauges]
 
         # Other words to avoid in git repositories.
         words_to_avoid = []
-        with open('../gitlang/others.txt', 'r') as languages:
+        other_file = path.join(path.abspath(path.dirname(__file__)),
+                               '../gitlang/others.txt')
+        with open(other_file, 'r') as languages:
             words_to_avoid = [line.strip() for line in languages]
 
         return list(itertools.chain(english_stopwords, git_languages,
