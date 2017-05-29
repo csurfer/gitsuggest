@@ -1,0 +1,3 @@
+[submodule "gitsuggest/gitlang"]
+	path = gitsuggest/gitlang
+	url = https://github.com/csurfer/gitlang.git

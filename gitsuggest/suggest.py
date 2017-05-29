@@ -152,14 +152,14 @@ class GitSuggest(object):
         # Languages in git repositories.
         git_languages = []
         language_file = path.join(path.abspath(path.dirname(__file__)),
-                                  '../gitlang/languages.txt')
+                                  'gitlang/languages.txt')
         with open(language_file, 'r') as langauges:
             git_languages = [line.strip() for line in langauges]
 
         # Other words to avoid in git repositories.
         words_to_avoid = []
         other_file = path.join(path.abspath(path.dirname(__file__)),
-                               '../gitlang/others.txt')
+                               'gitlang/others.txt')
         with open(other_file, 'r') as languages:
             words_to_avoid = [line.strip() for line in languages]
 

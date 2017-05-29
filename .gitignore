@@ -3,9 +3,6 @@
 .Python
 pip-selfcheck.json
 
-# Submodule directories to ignore.
-gitlang/
-
 # Directories to ignore.
 bin/
 include/
