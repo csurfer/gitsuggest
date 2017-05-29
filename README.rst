@@ -73,6 +73,9 @@ As a command
     # With just username in command to provide password secretly
     gitsuggest <username>
 
+    # Password can be skipped which means you chose to go the unauthenticated
+    # way which may raise RateLimitExceeded exception.
+
     # NOTE: Using it this way generates a static html page with the search
     # results. This gets opened it in your default browser.
 
@@ -84,6 +87,8 @@ As a module
     from gitsuggest import GitSuggest
 
     gs = GitSuggest(<username>, <password>)
+    # To use without authenticating
+    # gs = GitSuggest(<username>)
 
     # To get an iterator over suggested repositories.
     gs.get_suggested_repositories()
