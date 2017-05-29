@@ -46,8 +46,18 @@ Directly from the repository
 
 .. code:: bash
 
-    git clone https://github.com/csurfer/gitsuggest.git
+    git clone --recursive https://github.com/csurfer/gitsuggest.git
     python gitsuggest/setup.py install
+
+Post setup
+----------
+
+If you see a stopwords error, it means that you do not have the corpus
+`stopwords` downloaded from NLTK. You can download it using command below.
+
+.. code:: bash
+
+    python -c "import nltk; nltk.download('stopwords')"
 
 Usage
 -----
@@ -78,6 +88,20 @@ As a module
     # To get an iterator over suggested repositories.
     gs.get_suggested_repositories()
 
+FAQ
+---
+
+**Why do we need to authenticate (with password) to get suggestions, I browse
+gihub all the time without authenticating?**
+
+You don't. From `v0.0.4` you can choose to procure suggestions without actually
+authenticating with a password, but know that **access to github through API is
+highly rate limited** and it is much lesser for unauthenticated requests when
+compared to authenticated ones. More details about `ratelimits`_.
+
+What this means is that when used without a password (unauthenticated) it may
+fail with `RateLimitExceeded` exception.
+
 Contributing
 ------------
 
@@ -97,3 +121,5 @@ Pull requests are most welcome.
    :target: https://raw.githubusercontent.com/csurfer/gitsuggest/master/LICENSE
 
 .. |Demo| image:: http://i.imgur.com/5j5YnLR.gif
+
+.. _ratelimits: https://developer.github.com/v3/search/#rate-limit
