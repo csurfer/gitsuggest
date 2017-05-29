@@ -1,8 +1,8 @@
 Release History
 =============
 
-v0.0.4
-------
+v0.0.4, v0.0.5
+--------------
 * Smart pagination usage for much faster response times.
 * py3 bug fixes to make it more stable.
 * Provision of a way to get suggestions without password. Even though it is
