@@ -49,9 +49,14 @@ def main():
         parser.print_help()
         return
 
-    password = getpass.getpass()
+    print('')
+    print('INFO: Authentication (with password) have higher rate limits.')
+    print('INFO: Skipping password might cause failure due to rate limit.')
+    print('')
 
-    print("Generating suggestions...")
+    password = getpass.getpass('Password (to skip press enter):')
+
+    print('Generating suggestions...')
 
     gs = GitSuggest(arguments.username, password)
     repos = list(gs.get_suggested_repositories())
