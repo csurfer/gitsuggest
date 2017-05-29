@@ -26,89 +26,100 @@ class GitSuggest(object):
     # that it is a spammy repository.
     MAX_DESC_LEN = 300
 
-    def __init__(self, username, password):
+    def __init__(self, username=None, password=None):
         """Constructor.
+
+        Username and password is used to get an authenticated handle which has
+        a higher rate limit when compared to unauthenticated handle which will
+        have much lesser rate limit.
 
         :param username: Github username.
         :param password: Github password.
         """
-        # Authenticated github user.
-        self.github = None
-        # Repositories authenticated user is interested in.
-        self.__repositories_interested_in = None
-        # Cleaned and sanitized tokens.
-        self.__cleaned_tokens = None
-        # Constructed LDA model.
+        assert username is not None, "Suggest cannot work without a username"
+
+        # Github handle.
+        if username is not None and password is not None and password != '':
+            self.github = github.Github(username, password)
+        else:
+            self.github = github.Github()
+
+        # Populate repositories to be used for generating suggestions.
+        self.user_starred_repositories = list()
+        self.user_following_starred_repositories = list()
+        self.__populate_repositories_of_interest(username)
+
+        # Construct LDA model.
         self.lda_model = None
+        self.__construct_lda_model()
+
         # Suggested repository set.
         self.suggested_repositories = None
+        # Search for repositories is the costliest operation so defer it as
+        # much as possible.
 
-        try:
-            authenticated_user = github.Github(username, password)
+    @staticmethod
+    def get_unique_repositories(repo_list):
+        """Method to create unique list of repositories from the list of
+        repositories given.
 
-            # Checking for authentication by fetching a property which on an
-            # un-authenticated account would throw an exception.
-            authenticated_user.get_user().name
-
-            self.github = authenticated_user
-        except github.GithubException:
-            raise ValueError('Unable to authenticate the user.')
-
-    def get_suggested_repositories(self):
-        """Method to procure suggested repositories for the user.
-
-        :return: Iterator to procure suggested repositories for the user.
+        :param repo_list: List of repositories which might contain duplicates.
+        :return: List of repositories with no duplicate in them.
         """
-        if self.suggested_repositories is None:
-            # Procure repositories to suggest to user.
-            repository_set = list()
-            for term_count in range(5, 2, -1):
-                query = self.__get_query_for_repos(term_count=term_count)
-                repository_set.extend(self.__get_repos_for_query(query))
+        unique_list = list()
+        included = defaultdict(lambda: False)
+        for repo in repo_list:
+            if not included[repo.full_name]:
+                unique_list.append(repo)
+                included[repo.full_name] = True
+        return unique_list
 
-            # Remove repositories authenticated user is already interested in.
-            # NOTE: set() operation on Repository list is buggy. So rely on
-            # your own way to weed out duplicates and self starred
-            # repositories.
-            catchy_repos = list()
-            included_repositories = defaultdict(lambda: False)
-            for repo in self.github.get_user().get_starred():
-                included_repositories[repo.description] = True
-            for repo in repository_set:
-                if not included_repositories[repo.description]:
-                    catchy_repos.append(repo)
-                    included_repositories[repo.description] = True
+    @staticmethod
+    def minus(repo_list_a, repo_list_b):
+        """Method to create a list of repositories such that the repository
+        belongs to repo list a but not repo list b.
 
-            # Filter out repositories with too long descriptions. This is a
-            # measure to weed out spammy repositories.
-            filtered_repos = []
+        In an ideal scenario we should be able to do this by set(a) - set(b)
+        but as GithubRepositories have shown that set() on them is not reliable
+        resort to this until it is all sorted out.
 
-            if len(catchy_repos) > 0:
-                for repo in catchy_repos:
-                    if repo is not None and \
-                       repo.description is not None and \
-                       len(repo.description) <= GitSuggest.MAX_DESC_LEN:
-                        filtered_repos.append(repo)
+        :param repo_list_a: List of repositories.
+        :param repo_list_b: List of repositories.
+        """
+        included = defaultdict(lambda: False)
 
-            # Present the repositories, highly starred to not starred.
-            filtered_repos = sorted(filtered_repos,
-                                    key=attrgetter('stargazers_count'),
-                                    reverse=True)
+        for repo in repo_list_b:
+            included[repo.full_name] = True
 
-            self.suggested_repositories = list()
+        a_minus_b = list()
+        for repo in repo_list_a:
+            if not included[repo.full_name]:
+                included[repo.full_name] = True
+                a_minus_b.append(repo)
 
-            # TODO: Investigate why set(repositories) still not able to remove
-            # duplicates.
-            for repo in filtered_repos:
-                if len(self.suggested_repositories) == 0:
-                    self.suggested_repositories.append(repo)
-                elif self.suggested_repositories[-1].description != \
-                        repo.description:
-                    self.suggested_repositories.append(repo)
+        return a_minus_b
 
-        # Return an iterator to help user fetch the repository listing.
-        for repository in self.suggested_repositories:
-            yield repository
+    def __populate_repositories_of_interest(self, username):
+        """Method to populate repositories which will be used to suggest
+        repositories for the user. For this purpose we use two kinds of
+        repositories.
+
+        1. Repositories starred by user him/herself.
+        2. Repositories starred by the users followed by the user.
+
+        :param username: Username for the user for whom repositories are being
+                         suggested for.
+        """
+        # Handle to the user to whom repositories need to be suggested.
+        user = self.github.get_user(username)
+
+        # Procure repositories starred by the user.
+        self.user_starred_repositories.extend(user.get_starred())
+
+        # Repositories starred by users followed by the user.
+        for following_user in user.get_following():
+            self.user_following_starred_repositories.extend(
+                following_user.get_starred())
 
     def __get_interests(self):
         """Method to procure description of repositories the authenticated user
@@ -121,22 +132,14 @@ class GitSuggest(object):
 
         :return: List of repository descriptions.
         """
-        if self.__repositories_interested_in is None:
-            self.__repositories_interested_in = list()
-
-            # Add starred repositories of the authenticated user.
-            cur_user = self.github.get_user()
-            self.__repositories_interested_in.extend(cur_user.get_starred())
-
-            # Add starred repositories of users followed by authenticated user.
-            # NOTE: Too time consuming at the moment.
-            # TODO: Check if this can be optimized by some kind of pagination.
-            for user in cur_user.get_following():
-                self.__repositories_interested_in.extend(user.get_starred())
+        # All repositories of interest.
+        repos_of_interest = itertools.chain(
+            self.user_starred_repositories,
+            self.user_following_starred_repositories)
 
         # Extract descriptions out of repositories of interest.
-        repo_desc = [r.description for r in self.__repositories_interested_in]
-        return list(set(repo_desc))
+        repo_descriptions = [repo.description for repo in repos_of_interest]
+        return list(set(repo_descriptions))
 
     def __get_words_to_ignore(self):
         """Compiles list of all words to ignore.
@@ -176,6 +179,12 @@ class GitSuggest(object):
         :param doc_list: Document list to clean and tokenize.
         :return: Cleaned and tokenized document list.
         """
+        # Some repositories fill entire documentation in description. We ignore
+        # such repositories for cleaner tokens.
+        doc_list = filter(
+            lambda x: x is not None and len(x) <= GitSuggest.MAX_DESC_LEN,
+            doc_list)
+
         cleaned_doc_list = list()
 
         # Regular expression to remove out all punctuations, numbers and other
@@ -202,7 +211,7 @@ class GitSuggest(object):
             tokens = [tok for tok in tokens if tok not in stopwords]
 
             # Filter Nones if any are introduced.
-            tokens = filter(lambda x: x is not None, tokens)
+            tokens = [tok for tok in tokens if tok is not None]
 
             cleaned_doc_list.append(tokens)
 
@@ -214,19 +223,13 @@ class GitSuggest(object):
         We do that by first fetching the descriptions of repositories user has
         shown interest in. We tokenize the hence fetched descriptions to
         procure list of cleaned tokens by dropping all the stop words and
-        langauge names from it.
+        language names from it.
 
         We use the cleaned and sanitized token list to train LDA model from
         which we hope to procure topics of interests to the authenticated user.
         """
         # Fetch descriptions of repos of interest to authenticated user.
         repos_of_interest = self.__get_interests()
-
-        # Some repositories fill entire documentation in description. We ignore
-        # such repositories for cleaner tokens.
-        repos_of_interest = filter(
-            lambda x: x is not None and len(x) <= GitSuggest.MAX_DESC_LEN,
-            repos_of_interest)
 
         # Procure clean tokens from the descriptions.
         cleaned_tokens = self.__clean_and_tokenize(repos_of_interest)
@@ -246,19 +249,59 @@ class GitSuggest(object):
         :param term_count: Count of terms in query.
         :return: Query string.
         """
-        if self.lda_model is None:
-            self.__construct_lda_model()
-
         repo_query_terms = list()
         for term in self.lda_model.get_topic_terms(0, topn=term_count):
             repo_query_terms.append(self.lda_model.id2word[term[0]])
-
         return ' '.join(repo_query_terms)
 
     def __get_repos_for_query(self, query):
         """Method to procure git repositories for the query provided.
 
+        IMPORTANT NOTE: This is the costliest of all the calls hence keep this
+        to a minimum.
+
         :param query: String representing the repositories intend to search.
         :return: Iterator for repositories found using the query.
         """
-        return self.github.search_repositories(query, 'stars', 'desc')
+        return self.github.search_repositories(query,
+                                               'stars',
+                                               'desc').get_page(0)
+
+    def get_suggested_repositories(self):
+        """Method to procure suggested repositories for the user.
+
+        :return: Iterator to procure suggested repositories for the user.
+        """
+        if self.suggested_repositories is None:
+            # Procure repositories to suggest to user.
+            repository_set = list()
+            for term_count in range(5, 2, -1):
+                query = self.__get_query_for_repos(term_count=term_count)
+                repository_set.extend(self.__get_repos_for_query(query))
+
+            # Remove repositories authenticated user is already interested in.
+            catchy_repos = GitSuggest.minus(repository_set,
+                                            self.user_starred_repositories)
+
+            # Filter out repositories with too long descriptions. This is a
+            # measure to weed out spammy repositories.
+            filtered_repos = []
+
+            if len(catchy_repos) > 0:
+                for repo in catchy_repos:
+                    if repo is not None and \
+                       repo.description is not None and \
+                       len(repo.description) <= GitSuggest.MAX_DESC_LEN:
+                        filtered_repos.append(repo)
+
+            # Present the repositories, highly starred to not starred.
+            filtered_repos = sorted(filtered_repos,
+                                    key=attrgetter('stargazers_count'),
+                                    reverse=True)
+
+            self.suggested_repositories = GitSuggest.get_unique_repositories(
+                filtered_repos)
+
+        # Return an iterator to help user fetch the repository listing.
+        for repository in self.suggested_repositories:
+            yield repository

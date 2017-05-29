@@ -14,6 +14,8 @@ import unittest
 
 from gitsuggest import ReposToHTML
 
+from .mockentities import MockRepo
+
 
 class ReposToHTMLTest(unittest.TestCase):
     """Class to test :class:`ReposToHTML` functionality."""
@@ -21,21 +23,9 @@ class ReposToHTMLTest(unittest.TestCase):
     def test_get_html(self):
         """Tests convertion of repository object list to HTML page."""
 
-        class SampleRepo(object):
-            """Class to represent a repository."""
-
-            def __init__(self, name, description):
-                """Constructor.
-
-                :param name: Name of the repository.
-                :param description: Description of the repository.
-                """
-                self.full_name = name
-                self.description = description
-
-        repo_list = [SampleRepo('userA/proA', 'A Desc'),
-                     SampleRepo('userB/proB', 'B Desc'),
-                     SampleRepo('userC/proC', 'C Desc')]
+        repo_list = [MockRepo('userA/proA', 'A Desc'),
+                     MockRepo('userB/proB', 'B Desc'),
+                     MockRepo('userC/proC', 'C Desc')]
 
         r2h = ReposToHTML(repo_list)
         page = r2h.get_html()
