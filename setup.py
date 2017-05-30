@@ -17,7 +17,7 @@ setup(
     name='gitsuggest',
 
     # Details
-    version='0.0.7',
+    version='0.0.8',
     description='A tool to suggest github repositories based on the' +
                 ' repositories you have shown interest in.',
     long_description=long_description,
@@ -32,6 +32,11 @@ setup(
     # License
     license='MIT',
     packages=['gitsuggest'],
+    # NOTE: Package data to be included both in MANIFEST.in and here for sdist
+    # to consider it to put in package (MANIFEST) and for setuptools to copy
+    # it over (package_data).
+    package_dir={'gitsuggest': 'gitsuggest'},
+    package_data={'gitsuggest': ['res/*.template', 'gitlang/*.txt']},
     entry_points={
         'console_scripts': [
             'gitsuggest=gitsuggest.commandline:main',

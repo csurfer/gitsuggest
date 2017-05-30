@@ -1,5 +1,13 @@
 Release History
-=============
+===============
+
+NOTE: The versions are bumped up so frequently in the beginning to ensure all
+the major concerns are resolved and stability is achieved. Major versions will
+only be bumped for new kickass features or drastic change in design.
+
+v0.0.8
+------
+* Fixes to setup script to ensure package data is copied over.
 
 v0.0.7
 ------
