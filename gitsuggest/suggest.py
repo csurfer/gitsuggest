@@ -39,7 +39,7 @@ class GitSuggest(object):
         assert username is not None, "Suggest cannot work without a username"
 
         # Github handle.
-        if username is not None and password is not None and password != '':
+        if password is not None and password != '':
             self.github = github.Github(username, password)
         else:
             self.github = github.Github()
