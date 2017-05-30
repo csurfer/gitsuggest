@@ -1,6 +1,11 @@
 Release History
 =============
 
+v0.0.7
+------
+* Fixes to ensure proper packaging of resources instead of relying on
+  submodules.
+
 v0.0.4, v0.0.5, v0.0.6 (Unstable)
 ---------------------------------
 * Smart pagination usage for much faster response times.
