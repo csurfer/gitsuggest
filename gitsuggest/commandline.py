@@ -26,6 +26,7 @@ Usage:
 import argparse
 import getpass
 import webbrowser
+import github
 
 from .suggest import GitSuggest
 from .utilities import ReposToHTML
@@ -56,9 +57,14 @@ def main():
 
     password = getpass.getpass('Password (to skip press enter):')
 
-    print('Generating suggestions...')
+    try:
+        gs = GitSuggest(arguments.username, password)
+    except github.BadCredentialsException:
+        print("wrong password")
+        exit()
 
-    gs = GitSuggest(arguments.username, password)
+    print('Generating suggestions...')
+    
     repos = list(gs.get_suggested_repositories())
     r2h = ReposToHTML(repos)
 
