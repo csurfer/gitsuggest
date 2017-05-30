@@ -1,1 +1,4 @@
-include README.rst LICENSE
+include README.rst LICENSE CHANGELOG.rst
+include gitsuggest/gitlang/*
+include gitsuggest/res/*
+recursive-include tests *.py
