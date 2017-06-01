@@ -1,7 +1,7 @@
 gitsuggest
 ===========
 
-|Licence|
+|pypiv| |pyv| |Licence|
 
 A tool to suggest github repositories based on the repositories you have shown
 interest in.
@@ -121,6 +121,12 @@ Development
 Pull requests are most welcome.
 
 .. _issue tracker: https://github.com/csurfer/gitsuggest/issues
+
+.. |pypiv| image:: https://img.shields.io/pypi/v/gitsuggest.svg
+   :target: https://pypi.python.org/pypi/gitsuggest
+
+.. |pyv| image:: https://img.shields.io/pypi/pyversions/gitsuggest.svg
+   :target: https://pypi.python.org/pypi/gitsuggest
 
 .. |Licence| image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/csurfer/gitsuggest/master/LICENSE
