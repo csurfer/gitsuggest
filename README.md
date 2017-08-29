@@ -7,6 +7,8 @@
 
 A tool to suggest github repositories based on the repositories you have shown interest in.
 
+![Demo](http://i.imgur.com/5j5YnLR.gif)
+
 ## Whats happening here?
 
 > Programs must be written for people to read, and only incidentally for machines to execute. ~ Hal Abelson
@@ -34,7 +36,7 @@ git clone --recursive https://github.com/csurfer/gitsuggest.git
 python gitsuggest/setup.py install
 ```
 
-### Post setup
+## Post setup
 
 If you see a stopwords error, it means that you do not have the corpus stopwords downloaded from NLTK. You can download it using command below.
 
