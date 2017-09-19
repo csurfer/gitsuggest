@@ -26,7 +26,7 @@ class GitSuggest(object):
     # that it is a spammy repository.
     MAX_DESC_LEN = 300
 
-    def __init__(self, username=None, password=None):
+    def __init__(self, username=None, password=None, token=None):
         """Constructor.
 
         Username and password is used to get an authenticated handle which has
@@ -35,14 +35,20 @@ class GitSuggest(object):
 
         :param username: Github username.
         :param password: Github password.
+        :param token: Github access token.
         """
-        assert username is not None, "Suggest cannot work without a username"
-
-        # Github handle.
-        if username is not None and password is not None and password != '':
-            self.github = github.Github(username, password)
+        if token:
+            self.github = github.Github(token)
+            username = self.github.get_user().login
+            assert username is not None, 'Invalid token'
         else:
-            self.github = github.Github()
+            assert username is not None, "Suggest cannot work without username"
+            # Github handle.
+            if username is not None and \
+               password is not None and password != '':
+                self.github = github.Github(username, password)
+            else:
+                self.github = github.Github()
 
         # Populate repositories to be used for generating suggestions.
         self.user_starred_repositories = list()
