@@ -25,11 +25,11 @@ Usage:
     # Asks for password input in a secure way to fetch suggested repositories
     # for the authenticated user.
 """
-
 import argparse
 import getpass
 import webbrowser
 
+import crayons
 import github
 
 from .suggest import GitSuggest
@@ -64,11 +64,15 @@ def main():
         return
 
     print('')
-    print('INFO: Authentication (with password) have higher rate limits.')
-    print('INFO: Skipping password might cause failure due to rate limit.')
+    print(crayons.white(
+        'Authentication (with password) have higher rate limits.'))
+    print(crayons.white(
+        'Skipping password might cause failure due to rate limit.'))
     print('')
 
-    password = getpass.getpass('Password (to skip press enter):')
+    password = getpass.getpass(crayons.blue(
+        'Enter password (to skip press enter without entering anything): ',
+        bold=True))
 
     try:
         gs = GitSuggest(username=arguments.username,
@@ -76,10 +80,14 @@ def main():
                         token=None,
                         deep_dive=arguments.deep_dive)
     except github.BadCredentialsException:
-        print('Incorrect password provided, to skip password enter nothing.')
+        print('')
+        print(crayons.red(
+            'Incorrect password provided, to skip password enter nothing.',
+            bold=True))
         exit()
 
-    print('Suggestions generated !')
+    print('')
+    print(crayons.green('Suggestions generated !'))
 
     repos = list(gs.get_suggested_repositories())
     r2h = ReposToHTML(repos)

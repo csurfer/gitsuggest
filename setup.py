@@ -62,4 +62,4 @@ setup(
         # Topic tags.
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    install_requires=['pyenchant', 'gensim', 'PyGithub', 'nltk'])
+    install_requires=['pyenchant', 'gensim', 'PyGithub', 'nltk', 'crayons'])
