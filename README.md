@@ -7,7 +7,7 @@
 
 A tool to suggest github repositories based on the repositories you have shown interest in.
 
-![Demo](http://i.imgur.com/5j5YnLR.gif)
+![Demo](https://i.imgur.com/QihcRkT.gif)
 
 ## Whats happening here?
 
@@ -56,10 +56,18 @@ gitsuggest --help
 gitsuggest <username>
 
 # Password can be skipped which means you chose to go the unauthenticated
-# way which may raise RateLimitExceeded exception.
+# way which may raise RateLimitExceeded exception.To skip password enter
+# nothing when prompted for password and press enter.
 
 # NOTE: Using it this way generates a static html page with the search
 # results. This gets opened it in your default browser.
+
+# To fetch better suggestions at the cost of extra time and calls
+gitsuggest <username> --deep_dive
+
+# Without the --deep_dive flag we limit the suggestion to consider only
+# the repositories you have starred. With --deep_dive we also consider
+# repositories which people you follow have starred.
 ```
 
 ### As a module
@@ -67,9 +75,19 @@ gitsuggest <username>
 ```python
 from gitsuggest import GitSuggest
 
-gs = GitSuggest(<username>, <password>)
+# To use with username password combination
+gs = GitSuggest(username=<username>, password=<password>)
+
+# To use with access_token
+gs = GitSuggest(token=access_token)
+
 # To use without authenticating
-# gs = GitSuggest(<username>)
+gs = GitSuggest(username=<username>)
+
+# To use with deep dive flag
+gs = GitSuggest(username=<username>, password=<password>, token=None, deep_dive=True)
+gs = GitSuggest(token=access_token, deep_dive=True)
+gs = GitSuggest(username=<username>, deep_dive=True)
 
 # To get an iterator over suggested repositories.
 gs.get_suggested_repositories()

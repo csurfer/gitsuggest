@@ -1,9 +1,8 @@
-Release History
-===============
-
-NOTE: The versions are bumped up so frequently in the beginning to ensure all
-the major concerns are resolved and stability is achieved. Major versions will
-only be bumped for new kickass features or drastic change in design.
+v0.0.9
+------
+* `--deep_dive` flag to to provide user with control over accuracy vs time.
+* Access token based authentication for procuring repository reccomendations.
+* Prettier command line display.
 
 v0.0.8
 ------

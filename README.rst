@@ -74,10 +74,18 @@ As a command
     gitsuggest <username>
 
     # Password can be skipped which means you chose to go the unauthenticated
-    # way which may raise RateLimitExceeded exception.
+    # way which may raise RateLimitExceeded exception. To skip password enter
+    # nothing when prompted for password and press enter.
 
     # NOTE: Using it this way generates a static html page with the search
     # results. This gets opened it in your default browser.
+
+    # To fetch better suggestions at the cost of extra time and calls
+    gitsuggest <username> --deep_dive
+
+    # Without the --deep_dive flag we limit the suggestion to consider only
+    # the repositories you have starred. With --deep_dive we also consider
+    # repositories which people you follow have starred.
 
 As a module
 ~~~~~~~~~~~
@@ -86,9 +94,19 @@ As a module
 
     from gitsuggest import GitSuggest
 
-    gs = GitSuggest(<username>, <password>)
+    # To use with username password combination
+    gs = GitSuggest(username=<username>, password=<password>)
+
+    # To use with access_token
+    gs = GitSuggest(token=access_token)
+
     # To use without authenticating
-    # gs = GitSuggest(<username>)
+    gs = GitSuggest(username=<username>)
+
+    # To use with deep dive flag
+    gs = GitSuggest(username=<username>, password=<password>, token=None, deep_dive=True)
+    gs = GitSuggest(token=access_token, deep_dive=True)
+    gs = GitSuggest(username=<username>, deep_dive=True)
 
     # To get an iterator over suggested repositories.
     gs.get_suggested_repositories()
@@ -129,7 +147,7 @@ If you found the utility helpful you can buy me a cup of coffee using
 
 .. |Donate| image:: https://www.paypalobjects.com/webstatic/en_US/i/btn/png/silver-pill-paypal-44px.png
    :target: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=3BSBW7D45C4YN&lc=US&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted
-   
+
 .. |Thanks| image:: https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg
    :target: https://saythanks.io/to/csurfer
 
@@ -144,6 +162,6 @@ If you found the utility helpful you can buy me a cup of coffee using
 .. |Licence| image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/csurfer/gitsuggest/master/LICENSE
 
-.. |Demo| image:: http://i.imgur.com/5j5YnLR.gif
+.. |Demo| image:: https://i.imgur.com/QihcRkT.gif
 
 .. _ratelimits: https://developer.github.com/v3/search/#rate-limit
