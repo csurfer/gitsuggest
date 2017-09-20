@@ -17,6 +17,9 @@ Usage:
 
     optional arguments:
       -h, --help  show this help message and exit
+      --deep_dive  If added considers repositories starred by users you follow
+                   along with repositories you have starred. Is significantly
+                   slower.
 
     >>> gitsuggest <username>
     # Asks for password input in a secure way to fetch suggested repositories
@@ -26,6 +29,8 @@ Usage:
 import argparse
 import getpass
 import webbrowser
+
+import github
 
 from .suggest import GitSuggest
 from .utilities import ReposToHTML
@@ -42,6 +47,15 @@ def main():
                         help='Github Username',
                         default=None)
 
+    parser.add_argument('--deep_dive',
+                        help=' '.join([
+                            'If added considers repositories starred by users',
+                            'you follow along with repositories you have',
+                            'starred. Is significantly slower.'
+                        ]),
+                        action='store_true',
+                        default=False)
+
     # Parse command line arguments.
     arguments = parser.parse_args()
 
@@ -56,9 +70,17 @@ def main():
 
     password = getpass.getpass('Password (to skip press enter):')
 
-    print('Generating suggestions...')
+    try:
+        gs = GitSuggest(username=arguments.username,
+                        password=password,
+                        token=None,
+                        deep_dive=arguments.deep_dive)
+    except github.BadCredentialsException:
+        print('Incorrect password provided, to skip password enter nothing.')
+        exit()
 
-    gs = GitSuggest(arguments.username, password)
+    print('Suggestions generated !')
+
     repos = list(gs.get_suggested_repositories())
     r2h = ReposToHTML(repos)
 
