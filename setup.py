@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
+from setuptools.command.develop import develop
+from setuptools.command.install import install
 
 from os import path
 
@@ -12,12 +11,34 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst')) as f:
     long_description = f.read()
 
+
+def _post_install():
+    """Post installation nltk corpus downloads."""
+    import nltk
+    nltk.download('words')
+    nltk.download('stopwords')
+
+
+class PostDevelop(develop):
+    """Post-installation for development mode."""
+    def run(self):
+        develop.run(self)
+        self.execute(_post_install, [], msg='Running post installation tasks')
+
+
+class PostInstall(install):
+    """Post-installation for production mode."""
+    def run(self):
+        install.run(self)
+        self.execute(_post_install, [], msg='Running post installation tasks')
+
+
 setup(
     # Name of the module
     name='gitsuggest',
 
     # Details
-    version='0.0.9',
+    version='0.0.10',
     description='A tool to suggest github repositories based on the' +
                 ' repositories you have shown interest in.',
     long_description=long_description,
@@ -62,4 +83,8 @@ setup(
         # Topic tags.
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    install_requires=['pyenchant', 'gensim', 'PyGithub', 'nltk', 'crayons'])
+    install_requires=['gensim', 'PyGithub', 'nltk', 'crayons'],
+    cmdclass={
+        'develop': PostDevelop,
+        'install': PostInstall
+    })

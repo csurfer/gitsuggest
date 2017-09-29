@@ -1,3 +1,8 @@
+v0.0.10
+-------
+* Removing dependency on pyenchant and using nltk instead for english words.
+* Adding nltk corpus downloads as post installation tasks in setup.py.
+
 v0.0.9
 ------
 * `--deep_dive` flag to to provide user with control over accuracy vs time.

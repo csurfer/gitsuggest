@@ -12,10 +12,9 @@ from collections import defaultdict
 from operator import attrgetter
 from os import path
 
-import enchant
 import github
-import nltk
 from gensim import corpora, models
+from nltk.corpus import words, stopwords
 from nltk.tokenize import RegexpTokenizer
 
 
@@ -162,7 +161,7 @@ class GitSuggest(object):
         :return: List of words to ignore.
         """
         # Stop words in English.
-        english_stopwords = nltk.corpus.stopwords.words('english')
+        english_stopwords = stopwords.words('english')
 
         here = path.abspath(path.dirname(__file__))
 
@@ -184,7 +183,7 @@ class GitSuggest(object):
 
         :return: List of words to consider.
         """
-        return enchant.Dict('en_US')
+        return words.words()
 
     def __clean_and_tokenize(self, doc_list):
         """Method to clean and tokenize the document list.
@@ -218,7 +217,7 @@ class GitSuggest(object):
             tokens = tokenizer.tokenize(lower)
 
             # Include meaningful words.
-            tokens = [tok for tok in tokens if dict_words.check(tok)]
+            tokens = [tok for tok in tokens if tok in dict_words]
 
             # Remove stopwords.
             tokens = [tok for tok in tokens if tok not in stopwords]
