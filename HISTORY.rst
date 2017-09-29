@@ -1,3 +1,7 @@
+v0.0.11
+-------
+* Use sets instead of lists for speedup.
+
 v0.0.10
 -------
 * Removing dependency on pyenchant and using nltk instead for english words.

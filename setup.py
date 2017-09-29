@@ -38,7 +38,7 @@ setup(
     name='gitsuggest',
 
     # Details
-    version='0.0.10',
+    version='0.0.11',
     description='A tool to suggest github repositories based on the' +
                 ' repositories you have shown interest in.',
     long_description=long_description,

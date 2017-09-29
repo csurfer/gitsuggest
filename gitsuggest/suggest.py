@@ -175,15 +175,15 @@ class GitSuggest(object):
         with open(path.join(here, 'gitlang/others.txt'), 'r') as languages:
             words_to_avoid = [line.strip() for line in languages]
 
-        return list(itertools.chain(english_stopwords, git_languages,
-                                    words_to_avoid))
+        return set(itertools.chain(english_stopwords, git_languages,
+                                   words_to_avoid))
 
     def __get_words_to_consider(self):
         """Compiles list of all words to consider.
 
         :return: List of words to consider.
         """
-        return words.words()
+        return set(words.words())
 
     def __clean_and_tokenize(self, doc_list):
         """Method to clean and tokenize the document list.
