@@ -246,6 +246,14 @@ class GitSuggest(object):
         # Procure clean tokens from the descriptions.
         cleaned_tokens = self.__clean_and_tokenize(repos_of_interest)
 
+        # If cleaned tokens are empty, it can cause an exception while
+        # generating LDA. But tokens shouldn't be something meaningful as that
+        # would mean we are suggesting repos without reason. Hence the random
+        # string to ensure that LDA doesn't cause exception but the token
+        # doesn't generate any suggestions either.
+        if not cleaned_tokens:
+            cleaned_tokens = [['zkfgzkfgzkfgzkfgzkfgzkfg']]
+
         # Setup LDA requisites.
         dictionary = corpora.Dictionary(cleaned_tokens)
         corpus = [dictionary.doc2bow(text) for text in cleaned_tokens]

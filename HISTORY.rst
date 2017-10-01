@@ -1,3 +1,7 @@
+v0.0.12
+-------
+* 0 stars exception fix.
+
 v0.0.11
 -------
 * Use sets instead of lists for speedup.
