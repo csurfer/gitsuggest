@@ -31,6 +31,7 @@ import webbrowser
 
 import crayons
 import github
+from github.GithubException import BadCredentialsException, TwoFactorException
 
 from .suggest import GitSuggest
 from .utilities import ReposToHTML
@@ -79,10 +80,19 @@ def main():
                         password=password,
                         token=None,
                         deep_dive=arguments.deep_dive)
-    except github.BadCredentialsException:
+    except BadCredentialsException:
         print('')
         print(crayons.red(
             'Incorrect password provided, to skip password enter nothing.',
+            bold=True))
+        exit()
+    except TwoFactorException:
+        print('')
+        print(crayons.red(
+            '\n'.join([
+                'You have 2FA set up, please enter a personal access token.',
+                'You can generate one on https://github.com/settings/tokens'
+            ]),
             bold=True))
         exit()
 
