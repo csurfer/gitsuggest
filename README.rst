@@ -162,6 +162,6 @@ If you found the utility helpful you can buy me a cup of coffee using
 .. |Licence| image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/csurfer/gitsuggest/master/LICENSE
 
-.. |Demo| image:: https://i.imgur.com/QihcRkT.gif
+.. |Demo| image:: https://i.imgur.com/3AfvTxt.gif
 
 .. _ratelimits: https://developer.github.com/v3/search/#rate-limit

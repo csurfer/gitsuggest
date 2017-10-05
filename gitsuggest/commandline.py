@@ -25,12 +25,12 @@ Usage:
     # Asks for password input in a secure way to fetch suggested repositories
     # for the authenticated user.
 """
+
 import argparse
 import getpass
 import webbrowser
 
 import crayons
-import github
 from github.GithubException import BadCredentialsException, TwoFactorException
 
 from .suggest import GitSuggest
@@ -97,12 +97,12 @@ def main():
         exit()
 
     print('')
-    print(crayons.green('Suggestions generated !'))
-
-    repos = list(gs.get_suggested_repositories())
-    r2h = ReposToHTML(repos)
+    print(crayons.green('Suggestions generated!'))
 
     file_name = '/tmp/gitresults.html'
+    repos = list(gs.get_suggested_repositories())
+
+    r2h = ReposToHTML(arguments.username, repos)
     r2h.to_html(file_name)
 
     webbrowser.open_new('file://' + file_name)

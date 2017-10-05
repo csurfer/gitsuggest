@@ -8,49 +8,32 @@ This module contains utility classes which help in displaying the results.
 """
 
 from os import path
-from string import Template
+from jinja2 import FileSystemLoader, Environment
 
 
 class ReposToHTML(object):
     """Class to convert the repository list to HTML page with results."""
 
-    GITHUB_URL = 'https://github.com/'
-
-    def __init__(self, repositories):
+    def __init__(self, user, repos):
         """Constructor.
 
-        :param repositories: List of github.Repository objects.
+        :param user: User for whom we are fetching the repositories for.
+        :param repos: List of github.Repository objects.
         """
-        self.repositories = repositories
+        self.user = user
+        self.repos = repos
 
     def get_html(self):
         """Method to convert the repository list to a search results page."""
         here = path.abspath(path.dirname(__file__))
 
-        result_template = ""
-        with open(path.join(here, 'res/result.template')) as readfile:
-            result_template = readfile.read()
+        env = Environment(loader=FileSystemLoader(path.join(here, 'res/')))
+        suggest = env.get_template('suggest.htm.j2')
 
-        page_template = ""
-        with open(path.join(here, 'res/page.template')) as readfile:
-            page_template = readfile.read()
-
-        results = list()
-        for repo in self.repositories:
-            substitutions = {
-                'link': ReposToHTML.GITHUB_URL + repo.full_name,
-                'title': repo.full_name,
-                'description': repo.description
-            }
-            results.append(Template(result_template).substitute(substitutions))
-
-        result_html = '\n'.join(results)
-        substitutions = {
-            'results': result_html
-        }
-        page_html = Template(page_template).substitute(substitutions)
-
-        return page_html
+        return suggest.render(
+            logo=path.join(here, 'res/logo.png'),
+            user_login=self.user,
+            repos=self.repos)
 
     def to_html(self, write_to):
         """Method to convert the repository list to a search results page and

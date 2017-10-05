@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta
+      name="description"
+      content="A tool to suggest github repositories based on the repositories you have shown interest in.">
+    <meta
+      name="keywords"
+      content="GitHub, Repository suggestion engine, LDA">
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+      integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
+      crossorigin="anonymous">
+
+    <!-- GitHub Button CSS -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <div class="jumbotron">
+            <div class="container">
+              <div class="row">
+                <div class="col-2">
+                  <div class="card">
+                    <img
+                      class="card-img-top"
+                      src="{{ logo }}"
+                      alt="Site logo">
+                  </div>
+                </div>
+                <div class="col-10">
+                  <h1 class="display-4">gitSuggest  <span class="badge badge-dark">beta</span></h1>
+                  <p class="lead">An experimental tool which uses LDA to suggest github repositories
+                                    based on the repositories you have shown interest in.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-3">
+          <div class="card">
+            <h4 class="card-header">gitSuggest</h4>
+            <div class="card-body">
+              <a
+                  class="github-button"
+                  href="https://github.com/csurfer/gitsuggest"
+                  data-icon="octicon-star"
+                  data-size="large"
+                  data-show-count="true"
+                  aria-label="Star csurfer/gitsuggest on GitHub">Star</a>
+                <a
+                  class="github-button"
+                  href="https://github.com/csurfer/gitsuggest/fork"
+                  data-icon="octicon-repo-forked"
+                  data-size="large"
+                  data-show-count="true"
+                  aria-label="Fork csurfer/gitsuggest on GitHub">Fork</a>
+            </div>
+          </div>
+          <br>
+          <div class="card">
+            <h4 class="card-header">Contribute</h4>
+            <div class="card-body">
+              <a
+                href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=3BSBW7D45C4YN&lc=US&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"
+                target="_blank"
+                class="btn btn-primary btn-sm btn-block">Via Paypal</a>
+            </div>
+          </div>
+          <br>
+          <div class="card">
+            <h4 class="card-header">Stay connected</h4>
+            <div class="card-body">
+              <a
+                href="https://github.com/csurfer"
+                target="_blank"
+                class="btn btn-primary btn-sm btn-block">Follow on Github</a>
+              <a
+                href="https://www.linkedin.com/in/vishwas-sharma-2a210825/"
+                target="_blank"
+                class="btn btn-primary btn-sm btn-block">Follow on LinkedIn</a>
+              <a
+                href="https://github.com/csurfer/gitsuggest/issues"
+                target="_blank"
+                class="btn btn-primary btn-sm btn-block">Issue/Suggestion</a>
+              <a
+                href="https://saythanks.io/to/csurfer"
+                target="_blank"
+                class="btn btn-primary btn-sm btn-block">Say Thanks!</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-9">
+          {% block content %}{% endblock %}
+        </div>
+      </div>
+    </div>
+
+    <div class="footer" align="center">
+      &copy; 2017 <a href="https://csurfer.github.io/">Vishwas B Sharma</a>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+      integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+      crossorigin="anonymous"></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"
+      integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
+      crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,3 +1,11 @@
+v0.0.13
+-------
+* Better error message for 2FA authentication.
+* Cleaner UI to display the repositories.
+* More information about the repositories like the language and number of stars.
+* Making the UI same as UI for http://www.gitsuggest.com
+* Using Jinja2 for templating.
+
 v0.0.12
 -------
 * 0 stars exception fix.

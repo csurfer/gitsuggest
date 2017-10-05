@@ -38,7 +38,7 @@ setup(
     name='gitsuggest',
 
     # Details
-    version='0.0.12',
+    version='0.0.13',
     description='A tool to suggest github repositories based on the' +
                 ' repositories you have shown interest in.',
     long_description=long_description,
@@ -57,7 +57,7 @@ setup(
     # to consider it to put in package (MANIFEST) and for setuptools to copy
     # it over (package_data).
     package_dir={'gitsuggest': 'gitsuggest'},
-    package_data={'gitsuggest': ['res/*.template', 'gitlang/*.txt']},
+    package_data={'gitsuggest': ['res/*', 'gitlang/*']},
     entry_points={
         'console_scripts': [
             'gitsuggest=gitsuggest.commandline:main',
@@ -83,7 +83,7 @@ setup(
         # Topic tags.
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    install_requires=['gensim', 'PyGithub', 'nltk', 'crayons'],
+    install_requires=['gensim', 'PyGithub', 'nltk', 'crayons', 'jinja2'],
     cmdclass={
         'develop': PostDevelop,
         'install': PostInstall

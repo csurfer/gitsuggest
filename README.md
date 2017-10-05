@@ -7,7 +7,7 @@
 
 A tool to suggest github repositories based on the repositories you have shown interest in.
 
-![Demo](https://i.imgur.com/QihcRkT.gif)
+![Demo](https://i.imgur.com/3AfvTxt.gif)
 
 ## Whats happening here?
 

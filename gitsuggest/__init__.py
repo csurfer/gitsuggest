@@ -19,7 +19,7 @@ might be interested in based on user's interests.
 """
 
 __title__ = 'gitsuggest'
-__version__ = '0.0.12'
+__version__ = '0.0.13'
 __author__ = 'Vishwas B Sharma'
 __author_email__ = 'sharma.vishwas88@gmail.com'
 __license__ = 'MIT'
