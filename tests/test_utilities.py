@@ -23,17 +23,19 @@ class ReposToHTMLTest(unittest.TestCase):
     def test_get_html(self):
         """Tests convertion of repository object list to HTML page."""
 
-        repo_list = [MockRepo('userA/proA', 'A Desc'),
-                     MockRepo('userB/proB', 'B Desc'),
-                     MockRepo('userC/proC', 'C Desc')]
+        repo_list = [
+            MockRepo("userA/proA", "A Desc"),
+            MockRepo("userB/proB", "B Desc"),
+            MockRepo("userC/proC", "C Desc"),
+        ]
 
         r2h = ReposToHTML(repo_list)
         page = r2h.get_html()
 
         # Assert structure of HTML page.
-        self.assertTrue(page.startswith('<html>'))
-        self.assertTrue(page.endswith('</html>'))
-        self.assertEqual(page.count('section class'), len(repo_list))
+        self.assertTrue(page.startswith("<html>"))
+        self.assertTrue(page.endswith("</html>"))
+        self.assertEqual(page.count("section class"), len(repo_list))
 
         # Assert contents of HTML page.
         for repo in repo_list:
@@ -45,5 +47,5 @@ class ReposToHTMLTest(unittest.TestCase):
             self.assertEqual(page.count(link), 2)  # Links
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

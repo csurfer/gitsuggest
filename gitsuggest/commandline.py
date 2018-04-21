@@ -44,18 +44,20 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Adding command line arguments.
-    parser.add_argument('username',
-                        help='Github Username',
-                        default=None)
+    parser.add_argument("username", help="Github Username", default=None)
 
-    parser.add_argument('--deep_dive',
-                        help=' '.join([
-                            'If added considers repositories starred by users',
-                            'you follow along with repositories you have',
-                            'starred. Is significantly slower.'
-                        ]),
-                        action='store_true',
-                        default=False)
+    parser.add_argument(
+        "--deep_dive",
+        help=" ".join(
+            [
+                "If added considers repositories starred by users",
+                "you follow along with repositories you have",
+                "starred. Is significantly slower.",
+            ]
+        ),
+        action="store_true",
+        default=False,
+    )
 
     # Parse command line arguments.
     arguments = parser.parse_args()
@@ -64,49 +66,68 @@ def main():
         parser.print_help()
         return
 
-    print('')
-    print(crayons.white(
-        'Authentication (with password) have higher rate limits.'))
-    print(crayons.white(
-        'Skipping password might cause failure due to rate limit.'))
-    print('')
+    print("")
+    print(
+        crayons.white(
+            "Authentication (with password) have higher rate limits."
+        )
+    )
+    print(
+        crayons.white(
+            "Skipping password might cause failure due to rate limit."
+        )
+    )
+    print("")
 
-    password = getpass.getpass(crayons.blue(
-        'Enter password (to skip press enter without entering anything): ',
-        bold=True))
+    password = getpass.getpass(
+        crayons.blue(
+            "Enter password (to skip press enter without entering anything): ",
+            bold=True,
+        )
+    )
 
     try:
-        gs = GitSuggest(username=arguments.username,
-                        password=password,
-                        token=None,
-                        deep_dive=arguments.deep_dive)
+        gs = GitSuggest(
+            username=arguments.username,
+            password=password,
+            token=None,
+            deep_dive=arguments.deep_dive,
+        )
     except BadCredentialsException:
-        print('')
-        print(crayons.red(
-            'Incorrect password provided, to skip password enter nothing.',
-            bold=True))
+        print("")
+        print(
+            crayons.red(
+                "Incorrect password provided, to skip password enter nothing.",
+                bold=True,
+            )
+        )
         exit()
     except TwoFactorException:
-        print('')
-        print(crayons.red(
-            '\n'.join([
-                'You have 2FA set up, please enter a personal access token.',
-                'You can generate one on https://github.com/settings/tokens'
-            ]),
-            bold=True))
+        print("")
+        print(
+            crayons.red(
+                "\n".join(
+                    [
+                        "You have 2FA set up, please enter a personal access token.",
+                        "You can generate one on https://github.com/settings/tokens",
+                    ]
+                ),
+                bold=True,
+            )
+        )
         exit()
 
-    print('')
-    print(crayons.green('Suggestions generated!'))
+    print("")
+    print(crayons.green("Suggestions generated!"))
 
-    file_name = '/tmp/gitresults.html'
+    file_name = "/tmp/gitresults.html"
     repos = list(gs.get_suggested_repositories())
 
     r2h = ReposToHTML(arguments.username, repos)
     r2h.to_html(file_name)
 
-    webbrowser.open_new('file://' + file_name)
+    webbrowser.open_new("file://" + file_name)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

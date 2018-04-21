@@ -27,13 +27,14 @@ class ReposToHTML(object):
         """Method to convert the repository list to a search results page."""
         here = path.abspath(path.dirname(__file__))
 
-        env = Environment(loader=FileSystemLoader(path.join(here, 'res/')))
-        suggest = env.get_template('suggest.htm.j2')
+        env = Environment(loader=FileSystemLoader(path.join(here, "res/")))
+        suggest = env.get_template("suggest.htm.j2")
 
         return suggest.render(
-            logo=path.join(here, 'res/logo.png'),
+            logo=path.join(here, "res/logo.png"),
             user_login=self.user,
-            repos=self.repos)
+            repos=self.repos,
+        )
 
     def to_html(self, write_to):
         """Method to convert the repository list to a search results page and
@@ -43,5 +44,5 @@ class ReposToHTML(object):
         """
         page_html = self.get_html()
 
-        with open(write_to, 'wb') as writefile:
-            writefile.write(page_html.encode('utf-8'))
+        with open(write_to, "wb") as writefile:
+            writefile.write(page_html.encode("utf-8"))

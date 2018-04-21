@@ -17,5 +17,4 @@ class MockRepo(object):
         self.description = description
 
     def __eq__(self, other):
-        return self.full_name == other.full_name and \
-            self.description == other.description
+        return self.full_name == other.full_name and self.description == other.description
